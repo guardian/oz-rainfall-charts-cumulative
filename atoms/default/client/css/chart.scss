@@ -1,4 +1,4 @@
-.interactive-wrapper {
+#vaccineGoals {
 
 	border-top: 1px solid #dcdcdc;
     border-bottom: 1px solid #dcdcdc;
@@ -46,11 +46,11 @@
 		border-color: #ab0613;
 	}
 
-	.subTitle {
-		font-size: 16px;
+	.chartSubTitle {
+		font-size: 17px;
 	    line-height: 20px;
 	    color: #333333;
-	    font-family: "Guardian Egyptian Web", Georgia, serif;
+	    font-family: "Guardian Text Egyp Reg", Georgia, serif;
 	}
 
 	.footer {
@@ -78,7 +78,7 @@
 		font-size: 1.2em;
 		font-weight: bold;
 	    color: #333333;
-	    font-family: "Guardian Egyptian Web", Georgia, serif;
+	    font-family: "Guardian Text Egyp Reg", Georgia, serif;
 	}
 
 	.tick text {
