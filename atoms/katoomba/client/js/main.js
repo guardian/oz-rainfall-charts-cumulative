@@ -3,7 +3,6 @@ el.src = '<%= atomPath %>/app.js';
 document.body.appendChild(el);
 
 
-
 setTimeout(() => {
   if (window.resize) {  
     const html = document.querySelector('html')

@@ -1,17 +1,16 @@
 import * as d3 from "d3"
-import { textwrap } from 'd3-textwrap';
 
-function init(results) {
-	d3.textwrap = textwrap
-	const container = d3.select("#graphicContainer")
+export function cumulative(results, chartId) {
+
+	const container = d3.select(`.rainfall #graphicContainer`)
+
 	console.log(results)
-	var clone = clone = JSON.parse(JSON.stringify(results));
-	var data = clone.sheets.data
-	var details = clone.sheets.template
-	var labels = clone.sheets.labels
-	var userKey = clone['sheets']['key']
+	var data = results
+	// var details = clone.sheets.template
+	// var labels = clone.sheets.labels
+	// var userKey = clone['sheets']['key']
 	var breaks = "no"
-	var context = d3.select("#vaccineGoals")
+	var context = d3.select(`.rainfall #outer-wrapper`)
 
 	function numberFormat(num) {
         if ( num > 0 ) {
@@ -42,15 +41,17 @@ function init(results) {
 			isMobile = false;
 	}
 
-	var width = document.querySelector("#graphicContainer").getBoundingClientRect().width
+	var width = document.querySelector(`.rainfall #graphicContainer`).getBoundingClientRect().width
+
 	var height = width*0.6				
-	var margin = {top: 20, right: 80, bottom: 20, left:40}
-	var dateParse = d3.timeParse(details[0]['dateFormat'])
+	var margin = {top: 20, right: 70, bottom: 20, left:45}
+
+	var dateParse = d3.timeParse("%Y-%m-%d")
 
 	var scaleFactor = 1
 
-	if (windowWidth < 620) {
-		scaleFactor = windowWidth / 620
+	if (windowWidth < 820) {
+		scaleFactor = windowWidth / 860
 	}
 
 	console.log("scaleFactor",scaleFactor)
@@ -58,16 +59,16 @@ function init(results) {
 	width = width - margin.left - margin.right,
     height = height - margin.top - margin.bottom;
 
-	d3.select("#chartTitle").text(details[0].title)
-    d3.select("#subTitle").text(details[0].subtitle)
-    d3.select("#sourceText").html(details[0].source)
-    d3.select("#footnote").html(details[0].footnote)
-    d3.select("#graphicContainer svg").remove();
+	// context.select("#chartTitle").text(details[0].title)
+ //    context.select("#subTitle").text(details[0].subtitle)
+ //    context.select("#sourceText").html(details[0].source)
+ //    context.select("#footnote").html(details[0].footnote)
+    context.select("#graphicContainer svg").remove();
     
-    var chartKey = d3.select("#chartKey");
-	chartKey.html("");
+    var chartKey = context.select("#chartKey");
+	// chartKey.html("");
 
-	var svg = d3.select("#graphicContainer").append("svg")
+	var svg = context.select("#graphicContainer").append("svg")
 				.attr("width", width + margin.left + margin.right)
 				.attr("height", height + margin.top + margin.bottom)
 				.attr("id", "svg")
@@ -76,49 +77,41 @@ function init(results) {
 	var features = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 	var keys = Object.keys(data[0])
-
-
-	var xVar;
-
-	if (details[0]['xColumn']) {
-		xVar = details[0]['xColumn'];
-		keys.splice(keys.indexOf(xVar), 1);
-	}
+	var xVar = keys[0]
 	
-	else {
-		xVar = keys[0]
-		keys.splice(0, 1);
-	}
+	keys.splice(0, 1);
 	
-	console.log(xVar, keys);
+	
+	// console.log(xVar, keys);
 
-	var colors = ["rgb(204, 10, 17)","#ff7f00"];
-
+	var colors = ["#e08214","#8073ac","#4393c3","rgb(204, 10, 17)"];
 	var color = d3.scaleOrdinal();
 
-	color.domain(keys).range(colors);
+	color.domain([keys]).range(colors);
 	
-	console.log(color.domain())
+	// console.log(color.domain())
 
-	keys.forEach(function(key,i) { 
+	// keys.forEach(function(key,i) { 
 
-		var keyDiv = chartKey.append("div")
-						.attr("class","keyDiv")
+	// 	var keyDiv = chartKey.append("div")
+	// 					.attr("class","keyDiv")
 
-		keyDiv.append("span")
-			.attr("class", "keyCircle")
-			.style("background-color", function() {
-					return color(key);
-				}
-			)
+	// 	keyDiv.append("span")
+	// 		.attr("class", "keyCircle")
+	// 		.style("background-color", function() {
+	// 				return color(key);
+	// 			}
+	// 		)
 
-		keyDiv.append("span")
-			.attr("class", "keyText")
-			.text(key)
+	// 	keyDiv.append("span")
+	// 		.attr("class", "keyText")
+	// 		.text(key)
 
-	})
+	// })
 
 	// data.forEach(function(d) {
+
+	// 	d[xVar] = d[xVar].replace("1900", "2021")
 
 	// 	if (dateParse != null) {
 	// 		if (typeof d[xVar] === 'string') {
@@ -130,8 +123,6 @@ function init(results) {
 	// 	keys.forEach(function(key,i) { 
 	// 		d[key] = +d[key]
 	// 	});	
-	// 		d.Total = d3.sum(keys, k => +d[k]);
-		
 		
 	// })
 
@@ -187,7 +178,7 @@ function init(results) {
 					
 				}
 				else if (d[key] != "") {
-					console.log("blag")
+					
 					if (!isNaN(d[key])) {
 						
 						d[key] = +d[key]
@@ -208,9 +199,10 @@ function init(results) {
 
 	});
 
-	console.log("allValues", allValues)
 	data.forEach(function(d) {
 		if (typeof d[xVar] == 'string') {	
+			d[xVar] = d[xVar].replace("1900", "2021")
+			d[xVar] = d[xVar].replace("1901", "2022")
 			d[xVar] = dateParse(d[xVar])
 		}	
 	})
@@ -235,52 +227,50 @@ function init(results) {
 	})	
 
 
-	var areaData = data.filter(d => {return d[xVar] <= keyData[keys[0]][keyData[keys[0]].length - 1][xVar]})
+	// var areaData = data.filter(d => {return d[xVar] <= keyData[keys[0]][keyData[keys[0]].length - 1][xVar]})
 
-	console.log("areaData", areaData)
+	// console.log("areaData", areaData)
 
-	const area = d3.area()
+	const area1 = d3.area()
       .x((d) => x(d[xVar]))
-      .y0((d) => { 
-      	console.log(d)
-      	return y(d[keys[0]])
+      .y0((d) =>  y(d['Median']))
+      .y1((d) => y(d['Very wet']))
 
-      	})
-      .y1((d) => y(d[keys[1]]))
+    const area2 = d3.area()
+      .x((d) => x(d[xVar]))
+      .y0((d) =>  y(d['Very dry']))
+      .y1((d) => y(d['Median']))  
 
-	console.log("keyData",keyData)
+	// console.log("keyData",keyData)
 
-	labels.forEach(function(d,i) {
-		if (typeof d.x == 'string') {
-			d.x = dateParse(d.x);
-		}	
+	// labels.forEach(function(d,i) {
+	// 	if (typeof d.x == 'string') {
+	// 		d.x = dateParse(d.x);
+	// 	}	
 
-		if (typeof d.y == 'string') {
-			d.y = +d.y;
-		}
+	// 	if (typeof d.y == 'string') {
+	// 		d.y = +d.y;
+	// 	}
 
-		if (typeof d.offset == 'string') {
-			d.offset = +d.offset;
-		}
+	// 	if (typeof d.offset == 'string') {
+	// 		d.offset = +d.offset;
+	// 	}
 
-	})
+	// })
 
 	var min;
 
-	if (details[0]['baseline'] === 'zero') {
+	// if (details[0]['baseline'] === 'zero') {
 		min = 0;
-	}
-	else {
-		min = d3.min(allValues);
-	}
+	// }
+	// else {
+	// 	min = d3.min(allValues);
+	// }
 
 
 
 	x.domain(d3.extent(data, function(d) { return d[xVar]; }));
 	y.domain([0, d3.max(allValues)])
-
-	console.log(y.domain())
-	console.log(x.domain());
 
 	var xAxis;
 	var yAxis;
@@ -325,7 +315,7 @@ function init(results) {
 		.attr("dy", "0.71em")
 		.attr("fill", "#767676")
 		.attr("text-anchor", "end")
-		.text(details[0].yAxisLabel);
+		.text("Cumulative rainfall (mm)");
 
 	// features.append("text")
 	// 	.attr("x", width)
@@ -334,28 +324,38 @@ function init(results) {
 	// 	.attr("text-anchor", "end")
 	// 	.text(details[0].xAxisLabel);	
 
-	d3.selectAll(".tick line")
+	context.selectAll(".tick line")
 		.attr("stroke", "#767676")
 
-	d3.selectAll(".tick text")
+	context.selectAll(".tick text")
 		.attr("fill", "#767676")			
 
-	d3.selectAll(".domain")
+	context.selectAll(".domain")
 		.attr("stroke", "#767676")		
 
 	// var areaPath = features.selectAll(".areaPath").data()
 
 	features.append("path")
-			.datum(areaData)
+			.datum(data)
 			.attr("class", "areaPath")
-			.attr("fill", "rgb(245, 189, 44)")
+			.attr("fill", "#b2abd2")
 			.attr("opacity", 0.6)
 			.attr("stroke", "none")
-			.attr("d", area)		
+			.attr("d", area1)
+
+	features.append("path")
+			.datum(data)
+			.attr("class", "areaPath")
+			.attr("fill", "#fdb863")
+			.attr("opacity", 0.6)
+			.attr("stroke", "none")
+			.attr("d", area2)		
+
+		// console.log(keyData[key])
 
 	keys.forEach(function(key,i) {
 
-		console.log(keyData[key])
+		// console.log(keyData[key])
 
 		features.append("path")
 			.datum(keyData[key])
@@ -381,6 +381,29 @@ function init(results) {
           .attr("r", 4)
           .style("opacity", 1)	
 
+        
+        features
+          .append("text")
+          .attr("class", "lineLabels")
+          .attr("y", (d) => {
+            return (
+              y(keyData[key][keyData[key].length - 1][key]) +
+              4 
+            )
+          })
+          .attr("x", (d) => {
+            return (
+              x(keyData[key][keyData[key].length - 1][xVar]) + 5
+            )
+          })
+          .attr("fill", "none")
+          .attr("stroke", "#FFF")
+          .attr("stroke-width", 5)
+          .attr("opacity", 0.8)
+          .text((d) => {
+            return key
+          })  
+
         features
           .append("text")
           .attr("class", "lineLabels")
@@ -401,113 +424,107 @@ function init(results) {
             return key
           })
 
-
-
-
-       
-
 	});	
+       
 
 	context.selectAll(".annotationBox").remove()
 	var footerAnnotations = context.select("#footerAnnotations")
     footerAnnotations.html("")
 
-	 labels.forEach( (d,i) => {
+	//  labels.forEach( (d,i) => {
 
-        var labelX1, labelX2, labelY1, labelY2,textX, textY, mobileYOffset;
+ //        var labelX1, labelX2, labelY1, labelY2,textX, textY, mobileYOffset;
 
-        if (d.direction === "right") {
-        	labelX1 = x(d.x) + (d.offset * scaleFactor)
-        	labelX2 = x(d.x) + 6
-        	labelY1 = y(d.y)
-        	labelY2 = y(d.y)
-        	textX = x(d.x) + (d.offset * scaleFactor) + margin.left + 5
-        	textY = y(d.y) + margin.top - 30
-        	mobileYOffset = 4
-        }
+ //        if (d.direction === "right") {
+ //        	labelX1 = x(d.x) + (d.offset * scaleFactor)
+ //        	labelX2 = x(d.x) + 6
+ //        	labelY1 = y(d.y)
+ //        	labelY2 = y(d.y)
+ //        	textX = x(d.x) + (d.offset * scaleFactor) + margin.left + 5
+ //        	textY = y(d.y) + margin.top - 40
+ //        	mobileYOffset = 4
+ //        }
 
-        else if (d.direction === "top") {
-        	labelX1 = x(d.x)
-        	labelX2 = x(d.x)
-        	labelY1 = y(d.y) - (d.offset * scaleFactor)
-        	labelY2 = y(d.y) - 6
-        	textX = x(d.x) + margin.left - (80 * scaleFactor)
-        	textY = y(d.y) - (d.offset * scaleFactor) + margin.top - 40
-        	mobileYOffset = 0
-        }
+ //        else if (d.direction === "top") {
+ //        	labelX1 = x(d.x)
+ //        	labelX2 = x(d.x)
+ //        	labelY1 = y(d.y) - (d.offset * scaleFactor)
+ //        	labelY2 = y(d.y) - 6
+ //        	textX = x(d.x) + margin.left - (80 * scaleFactor)
+ //        	textY = y(d.y) - (d.offset * scaleFactor) + margin.top - 40
+ //        	mobileYOffset = 0
+ //        }
 
-		features
-		      .append("line")
-		      .attr("class", "annotationLine")
-		      .attr("x1", labelX1)
-		      .attr("y1", labelY1)
-		      .attr("x2", labelX2)
-		      .attr("y2", labelY2)
-		      .style("opacity", 1)
-		      .attr("marker-end", "url(#arrow)")
-		      .attr("stroke", "#000")
+	// 	features
+	// 	      .append("line")
+	// 	      .attr("class", "annotationLine")
+	// 	      .attr("x1", labelX1)
+	// 	      .attr("y1", labelY1)
+	// 	      .attr("x2", labelX2)
+	// 	      .attr("y2", labelY2)
+	// 	      .style("opacity", 1)
+	// 	      .attr("marker-end", "url(#arrow)")
+	// 	      .attr("stroke", "#000")
 		
-		if (isMobile) {
+	// 	if (isMobile) {
 
-		features.append("circle")
-				.attr("class", "annotationCircle")
-				.attr("cy", labelY1 - 4 + mobileYOffset)
-		        .attr("cx", labelX1)
-				.attr("r", 8)
-				.attr("fill", "#000");
+	// 	features.append("circle")
+	// 			.attr("class", "annotationCircle")
+	// 			.attr("cy", labelY1 - 4 + mobileYOffset)
+	// 	        .attr("cx", labelX1)
+	// 			.attr("r", 8)
+	// 			.attr("fill", "#000");
 
-		features.append("text")
-				.attr("class", "annotationTextMobile")
-				.attr("y", labelY1 + mobileYOffset)
-				.attr("x", labelX1)
-				.style("text-anchor", "middle")
-				.style("opacity", 1)
-				.attr("fill", "#FFF")
-				.text(i + 1);
-
-		console.log(labels.length)
+	// 	features.append("text")
+	// 			.attr("class", "annotationTextMobile")
+	// 			.attr("y", labelY1 + mobileYOffset)
+	// 			.attr("x", labelX1)
+	// 			.style("text-anchor", "middle")
+	// 			.style("opacity", 1)
+	// 			.attr("fill", "#FFF")
+	// 			.text(i + 1);
 		
-		if (labels.length > 0 && i ==0) {
-			footerAnnotations.append("span")
-				.attr("class", "annotationFooterHeader")
-				.text("Notes: ");
-		}
+	// 	if (labels.length > 0 && i ==0) {
+	// 		footerAnnotations.append("span")
+	// 			.attr("class", "annotationFooterHeader")
+	// 			.text("Notes: ");
+	// 	}
 
-		footerAnnotations.append("span")
-			.attr("class", "annotationFooterNumber")
-			.text(i+1 + " - ");
+	// 	footerAnnotations.append("span")
+	// 		.attr("class", "annotationFooterNumber")
+	// 		.text(i+1 + " - ");
 
-		if (i < labels.length -1 ) {
-			footerAnnotations.append("span")
-			.attr("class", "annotationFooterText")
-			.text(d.text + ", ");
-		}
+	// 	if (i < labels.length -1 ) {
+	// 		footerAnnotations.append("span")
+	// 		.attr("class", "annotationFooterText")
+	// 		.text(d.text + ", ");
+	// 	}
 		
-		else {
-			footerAnnotations.append("span")
-				.attr("class", "annotationFooterText")
-				.text(d.text);
-		}	
+	// 	else {
+	// 		footerAnnotations.append("span")
+	// 			.attr("class", "annotationFooterText")
+	// 			.text(d.text);
+	// 	}	
 
 	
 
-	}
+	// }
 
-	else {
+	// else {
 
-	container
-        .append("div")
-        .attr("class", "annotationBox")
-        .style("position", "absolute")
-        .style("width", 250 * scaleFactor + "px")
-        .style("top", textY + "px")
-        .style("left", textX + "px")
-        .text(d.text)
+	// container
+ //        .append("div")
+ //        .attr("class", "annotationBox")
+ //        .style("position", "absolute")
+ //        .style("width", 250 * scaleFactor + "px")
+ //        .style("top", textY + "px")
+ //        .style("left", textX + "px")
+ //        .text(d.text)
 
-	}      
+	// }      
 
 
-	})  
+	// })  
 
 
 	 
@@ -517,25 +534,4 @@ function init(results) {
 
 }	// end init
 
-
-
-Promise.all([
-	d3.json(`https://interactive.guim.co.uk/yacht-charter-data/Covid-19_oz_vaccine_tracker_4m_gap.json`)
-	])
-	.then((results) =>  {
-		init(results[0])
-		var to=null
-		var lastWidth = document.querySelector("#graphicContainer").getBoundingClientRect()
-		window.addEventListener('resize', function() {
-			var thisWidth = document.querySelector("#graphicContainer").getBoundingClientRect()
-			if (lastWidth != thisWidth) {
-				window.clearTimeout(to);
-				to = window.setTimeout(function() {
-					    init(results[0])
-					}, 100)
-			}
-		
-		})
-
-	});
 

@@ -1,4 +1,4 @@
-#vaccineGoals {
+.interactive-wrapper {
 
 	border-top: 1px solid #dcdcdc;
     border-bottom: 1px solid #dcdcdc;
@@ -24,6 +24,22 @@
 		font-size:1.2em;
 	}
 
+	  #loadingContainer {
+    	text-align: center;
+    	width:auto;
+        margin-left:5px;        
+        border-radius: 16px;
+        text-align: center;
+        padding: 5px 10px;
+        font-size: 16px;
+        color:#FFFFFF;
+        background-color: #bdbdbd;
+        display: inline-block;
+        position: absolute;
+        left:49%;
+        top:20%;
+    }
+
 	.figureTitle {
 		font-size: 20px;
 	    line-height: 28px;
@@ -31,7 +47,7 @@
 	    -webkit-font-smoothing: antialiased;
 	    color: #333333;
 	    font-family: "Guardian Headline Full", Georgia, serif;
-	    margin-bottom: 2px;
+	    margin-bottom: 10px;
 	}
 
 	a {
@@ -46,11 +62,12 @@
 		border-color: #ab0613;
 	}
 
-	.chartSubTitle {
-		font-size: 17px;
+	.subTitle {
+		font-size: 16px;
 	    line-height: 20px;
 	    color: #333333;
-	    font-family: "Guardian Text Egyp Reg", Georgia, serif;
+	    font-family: "Guardian Egyptian Web", Georgia, serif;
+	    margin-bottom: 15px;
 	}
 
 	.footer {
@@ -78,7 +95,7 @@
 		font-size: 1.2em;
 		font-weight: bold;
 	    color: #333333;
-	    font-family: "Guardian Text Egyp Reg", Georgia, serif;
+	    font-family: "Guardian Egyptian Web", Georgia, serif;
 	}
 
 	.tick text {
